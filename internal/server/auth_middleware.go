@@ -23,13 +23,13 @@ func (s *Server) AuthMiddleware(next http.Handler) http.Handler {
 		token, err := utils.ExtractJwtFromHeader(r.Header)
 		if err != nil {
 			log.Println(err)
-			utils.SendResponse(w, http.StatusUnauthorized, utils.DefaultUnauthenticatedResponse)
+			utils.SendResponse(w, http.StatusForbidden, utils.DefaultUnauthenticatedResponse)
 			return
 		}
 
 		if err = token.Valid(); err != nil {
 			log.Println(err)
-			utils.SendResponse(w, http.StatusUnauthorized, utils.DefaultUnauthenticatedResponse)
+			utils.SendResponse(w, http.StatusForbidden, utils.DefaultUnauthenticatedResponse)
 			return
 		}
 
@@ -37,7 +37,7 @@ func (s *Server) AuthMiddleware(next http.Handler) http.Handler {
 
 		if err != nil {
 			log.Println(err)
-			utils.SendResponse(w, http.StatusUnauthorized, utils.DefaultUnauthenticatedResponse)
+			utils.SendResponse(w, http.StatusForbidden, utils.DefaultUnauthenticatedResponse)
 			return
 		}
 
@@ -58,4 +58,20 @@ func (s *Server) AuthMiddleware(next http.Handler) http.Handler {
 		next.ServeHTTP(w, r)
 
 	})
+}
+
+func (s *Server) AllowedUserWithRole(role database.UserRole, next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		userRole := r.Context().Value(UserRoleKey).(database.UserRole)
+
+		if userRole != role {
+			utils.SendResponse(w, http.StatusUnauthorized, utils.DefaultUnauthenticatedResponse)
+			return
+		}
+
+		next.ServeHTTP(w, r)
+	})
+}
+func (s *Server) AllowedOnlyAdmin(next http.Handler) http.Handler {
+	return s.AllowedUserWithRole(database.UserRoleAdmin, next)
 }

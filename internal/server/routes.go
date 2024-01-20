@@ -17,6 +17,7 @@ func (s *Server) RegisterRoutes() http.Handler {
 
 	v1Router := chi.NewRouter()
 	authRouter := chi.NewRouter()
+	inscriptionRouter := chi.NewRouter()
 
 	v1Router.Get("/", s.HelloWorldHandler)
 
@@ -25,8 +26,16 @@ func (s *Server) RegisterRoutes() http.Handler {
 	// authRouter.Post("/logout", func(w http.ResponseWriter, r *http.Request) {
 	// 	s.AuthMiddleware(http.HandlerFunc(s.LogoutHandler)).ServeHTTP(w, r)
 	// })
+	inscriptionRouter.Use(s.AuthMiddleware)
+
+	inscriptionRouter.With(s.AllowedOnlyAdmin).Post("/", s.AddInscriptionHandler)
+	inscriptionRouter.With(s.AllowedOnlyAdmin).Delete("/{id}", s.DeleteInscrition)
+
+	inscriptionRouter.Get("/", s.GetAllInsciptions)
+	inscriptionRouter.Get("/{id}", s.GetInscritionById)
 
 	v1Router.Mount("/auth", authRouter)
+	v1Router.Mount("/inscription", inscriptionRouter)
 
 	r.Mount("/v1", v1Router)
 
