@@ -4,6 +4,7 @@ CREATE TABLE inscriptions(
     site TEXT,
     cisi_id VARCHAR(20),
     sequence_images TEXT [] CHECK (array_length(sequence_images, 1) > 0),
+    sequence_numbers INTEGER [] CHECK (array_length(sequence_numbers, 1) > 0),
     wells_id VARCHAR(20),
     artifact_type VARCHAR(20),
     material_type VARCHAR(50),

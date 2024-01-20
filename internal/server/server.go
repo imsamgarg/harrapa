@@ -1,26 +1,35 @@
 package server
 
 import (
+	"database/sql"
 	"fmt"
 	"net/http"
 	"os"
 	"strconv"
 	"time"
 
-	_ "github.com/joho/godotenv/autoload"
 	"harrapa/internal/database"
+
+	"github.com/go-playground/validator/v10"
+	_ "github.com/joho/godotenv/autoload"
 )
 
+var validate = validator.New()
+
 type Server struct {
-	port int
-	db   database.Service
+	port  int
+	db    *database.Queries
+	sqldb *sql.DB
 }
 
 func NewServer() *http.Server {
 	port, _ := strconv.Atoi(os.Getenv("PORT"))
+	db, sqldb := database.NewConn()
+
 	NewServer := &Server{
-		port: port,
-		db:   database.New(),
+		port:  port,
+		db:    db,
+		sqldb: sqldb,
 	}
 
 	// Declare Server config
