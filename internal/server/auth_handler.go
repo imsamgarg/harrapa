@@ -22,12 +22,13 @@ func (s *Server) LoginHandler(w http.ResponseWriter, r *http.Request) {
 
 	user, err := s.db.GetUserByEmail(r.Context(), params.Email)
 	if err != nil {
+		log.Println(err)
 		utils.SendResponse(w, 400, utils.NewErrorResponse("Incorrect email or password"))
 		return
 	}
 
 	isSamePassword, err := utils.CompareHashAndPassword(user.Password, params.Passsword)
-	if err != nil || isSamePassword {
+	if err != nil || !isSamePassword {
 		utils.SendResponse(w, 400, utils.NewErrorResponse("Incorrect email or password"))
 		return
 	}

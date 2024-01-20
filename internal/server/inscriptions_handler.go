@@ -17,6 +17,7 @@ func (s *Server) AddInscriptionHandler(w http.ResponseWriter, r *http.Request) {
 	var params database.InscriptionModel
 
 	if err := json.NewDecoder(r.Body).Decode(&params); err != nil {
+		log.Println(err)
 		utils.SendBadRequestResponse(w)
 		return
 	}

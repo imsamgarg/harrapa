@@ -65,8 +65,8 @@ func ToInscription(im InscriptionModel) (Inscription, error) {
 func NewInscriptionModelList(inscriptions []Inscription) []InscriptionModel {
 	arr := make([]InscriptionModel, len(inscriptions))
 
-	for _, i := range inscriptions {
-		arr = append(arr, NewInscriptionModel(i))
+	for i, inscription := range inscriptions {
+		arr[i] = NewInscriptionModel(inscription)
 	}
 
 	return arr
